@@ -9,3 +9,6 @@ source .venv/bin/activate
 
 python stamp_pdf.py
 ```
+
+## Todo
+use Rust + Tauri
