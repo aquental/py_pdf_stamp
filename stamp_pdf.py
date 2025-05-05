@@ -4,9 +4,9 @@ from pathlib import Path
 from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.utils import ImageReader
+# from reportlab.lib.utils import ImageReader
 
-from PyPDF2 import PdfWriter, PdfReader
+from pypdf import PdfWriter, PdfReader
 
 
 def stamp_pdf(input_pdf_path, stamp_image_path, output_pdf_path, scale=0.5):
@@ -101,7 +101,7 @@ def stamp_pdf(input_pdf_path, stamp_image_path, output_pdf_path, scale=0.5):
 
 if __name__ == "__main__":
     # Example usage
-    input_pdf_path = "input.pdf"  # Replace with your input PDF
+    input_pdf_path = "1842.pdf"  # Replace with your input PDF
     stamp_image_path = "stamp.png"  # Replace with your stamp image
     output_pdf_path = "output.pdf"  # Replace with your desired output PDF name
 
