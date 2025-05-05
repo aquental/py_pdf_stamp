@@ -23,7 +23,7 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
     # Construct the input PDF path
     input_pdf_path = Path("./notas") / f"{filename}.pdf"
 
-    output_pdf_path = Path("./out") / f"_{filename}.pdf"
+    output_pdf_path = Path("./out") / f"{filename}.pdf"
     # Read the existing PDF
     try:
         input_pdf = PdfReader(input_pdf_path)
