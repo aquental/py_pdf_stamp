@@ -10,11 +10,13 @@ source .venv/bin/activate
 
 uv pip install Pillow
 uv pip install Pypdf
+uv pip install reportlab
 
-uv install 
+uv install
 
 python stamp_pdf.py
 ```
 
 ## Todo
+
 use Rust + Tauri
