@@ -4,24 +4,26 @@ from pathlib import Path
 from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-# from reportlab.lib.utils import ImageReader
 
 from pypdf import PdfWriter, PdfReader
 
 
-def stamp_pdf(input_pdf_path, stamp_image_path, output_pdf_path, scale=0.5):
+def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
     """
     Adds an image (stamp) to an existing PDF file.
 
     Args:
-        input_pdf_path: Path to the input PDF file.
-        stamp_image_path: Path to the stamp image file (e.g., PNG).
-        output_pdf_path: Path to the output PDF file.
-        x_pos: X-coordinate of the stamp's bottom-left corner.
-        y_pos: Y-coordinate of the stamp's bottom-left corner.
+        stamp_image_path: Path to the stamp image file (e.g., PNG).        
         scale: Scaling factor for the stamp image.
+    Internal:
+        input_pdf_path: Path to the input PDF file.
+        output_pdf_path: Path to the output PDF file.
     """
 
+    # Construct the input PDF path
+    input_pdf_path = Path("./notas") / f"{filename}.pdf"
+
+    output_pdf_path = Path("./out") / f"_{filename}.pdf"
     # Read the existing PDF
     try:
         input_pdf = PdfReader(input_pdf_path)
@@ -99,11 +101,42 @@ def stamp_pdf(input_pdf_path, stamp_image_path, output_pdf_path, scale=0.5):
     print(f"Stamped PDF created: {output_pdf_path}")
 
 
+def list_filenames_in_notas():
+    """
+    Lists all files in the ./notas subdirectory and extracts their names (without path or extension).
+
+    Returns:
+        list: A list of filenames (without extensions) found in ./notas.
+    """
+    # Define the path to the ./notas directory
+    notas_dir = Path("./notas")
+
+    # Check if the directory exists
+    if not notas_dir.exists():
+        print(f"Error: Directory {notas_dir} does not exist.")
+        return []
+
+    # Get all files in the ./notas directory
+    filenames = [file.stem for file in notas_dir.glob(
+        "*.pdf") if file.is_file()]
+
+    # Print the filenames
+    if filenames:
+        print("Notas presentes em ./notas:")
+        for name in filenames:
+            print(name + " :")
+            stamp_pdf(name)
+    else:
+        print("No files found in ./notas.")
+
+    # return filenames
+
+
 if __name__ == "__main__":
     # Example usage
-    input_pdf_path = "1842.pdf"  # Replace with your input PDF
-    stamp_image_path = "stamp.png"  # Replace with your stamp image
-    output_pdf_path = "output.pdf"  # Replace with your desired output PDF name
+    input_pdf_path = "1842"  # Replace with your input PDF
+    # stamp_image_path = "stamp.png"  # Replace with your stamp image
 
-    stamp_pdf(input_pdf_path, stamp_image_path, output_pdf_path, scale=0.35)
-    print(f"Stamped PDF created: {output_pdf_path}")
+    # stamp_pdf(input_pdf_path, stamp_image_path, scale=0.35)
+
+    list_filenames_in_notas()
