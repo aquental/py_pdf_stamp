@@ -13,25 +13,27 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
     Adds an image (stamp) to an existing PDF file.
 
     Args:
-        stamp_image_path: Path to the stamp image file (e.g., PNG).        
-        scale: Scaling factor for the stamp image.
+        filename (str): The base name of the PDF file to stamp.
+        stamp_image_path (str): Path to the stamp image file (e.g., PNG).
+        scale (float): Scaling factor for the stamp image.
+
     Internal:
-        input_pdf_path: Path to the input PDF file.
-        output_pdf_path: Path to the output PDF file.
+        input_pdf_path (Path): Path to the input PDF file.
+        output_pdf_path (Path): Path to the output PDF file.
     """
 
     # Construct the input PDF path
     input_pdf_path = Path("./notas") / f"{filename}.pdf"
-
     output_pdf_path = Path("./out") / f"{filename}.pdf"
+
     # Read the existing PDF
     try:
         input_pdf = PdfReader(input_pdf_path)
     except FileNotFoundError:
-        print(f"Error: Input PDF file not found: {input_pdf_path}")
+        print(f"Erro: PDF não encontrado : {input_pdf_path}")
         return
     except Exception as e:
-        print(f"Error: Could not read input PDF: {e}")
+        print(f"Erro: Não foi possível ler : {e}")
         return
 
     output_pdf = PdfWriter()
@@ -40,31 +42,34 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
     try:
         img = Image.open(stamp_image_path)
     except FileNotFoundError:
-        print(f"Error: Stamp image file not found: {stamp_image_path}")
+        print(f"Erro: Assinatura não encontrada: {stamp_image_path}")
         return
     except Exception as e:
-        print(f"Error: Could not open stamp image: {e}")
+        print(f"Erro: Não consegui abrir a assinatura: {e}")
         return
 
     img_width, img_height = img.size
     scaled_width = img_width * scale
     scaled_height = img_height * scale
 
+    # Process each page of the input PDF
     for page_num in range(len(input_pdf.pages)):
         page = input_pdf.pages[page_num]
 
         # Create a new PDF canvas to hold the stamp
         packet = io.BytesIO()
-        # You may need to adjust pagesize
         can = canvas.Canvas(packet, pagesize=letter)
+
         # Determine page size and calculate center position
         page_width = float(page.mediabox[2])
         page_height = float(page.mediabox[3])
         x_pos = (page_width - scaled_width) / 2 + 90
         y_pos = (page_height - scaled_height) / 2 - 10
-        print(
-            f"Processing page {page_num + 1}: x_pos = {x_pos}, y_pos = {y_pos}...")
+        # print(
+        #     f"Processing page {page_num + 1}: x_pos = {x_pos}, y_pos = {y_pos}...")
+
         try:
+            # Draw the image onto the canvas
             can.drawImage(
                 stamp_image_path,
                 x_pos,
@@ -75,7 +80,7 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
             )
             can.save()
         except Exception as e:
-            print(f"Error drawing image on canvas: {e}")
+            print(f"Erro ao desenhar assinatura: {e}")
             continue  # Try to process remaining pages
 
         # Move to the beginning of the buffer
@@ -86,8 +91,10 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
         try:
             page.merge_page(stamp_pdf_reader.pages[0])
         except Exception as e:
-            print(f"Error merging stamp with page: {e}")
+            print(f"Erro ao mesclar assinatura com a página : {e}")
             continue  # Try to process remaining pages
+
+        # Add the page to the output PDF
         output_pdf.add_page(page)
 
     # Write the output PDF
@@ -95,13 +102,13 @@ def stamp_pdf(filename, stamp_image_path="./assets/stamp.png", scale=0.35):
         with open(output_pdf_path, "wb") as output_file:
             output_pdf.write(output_file)
     except Exception as e:
-        print(f"Error writing output PDF: {e}")
+        print(f"Erro ao escrever saida PDF: {e}")
         return
 
-    print(f"Stamped PDF created: {output_pdf_path}")
+    # print(f"PDF assinado com sucesso: {output_pdf_path}")
 
 
-def list_filenames_in_notas():
+def stamp_filenames():
     """
     Lists all files in the ./notas subdirectory and extracts their names (without path or extension).
 
@@ -113,7 +120,7 @@ def list_filenames_in_notas():
 
     # Check if the directory exists
     if not notas_dir.exists():
-        print(f"Error: Directory {notas_dir} does not exist.")
+        print(f"Erro: diretório {notas_dir} não existe.")
         return []
 
     # Get all files in the ./notas directory
@@ -127,16 +134,11 @@ def list_filenames_in_notas():
             print(name + " :")
             stamp_pdf(name)
     else:
-        print("No files found in ./notas.")
+        print("Não foram encontradas notas em {notas_dir}.")
 
     # return filenames
 
 
 if __name__ == "__main__":
-    # Example usage
-    input_pdf_path = "1842"  # Replace with your input PDF
-    # stamp_image_path = "stamp.png"  # Replace with your stamp image
 
-    # stamp_pdf(input_pdf_path, stamp_image_path, scale=0.35)
-
-    list_filenames_in_notas()
+    stamp_filenames()
